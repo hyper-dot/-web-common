@@ -26,11 +26,11 @@ export class RequestHandler {
 
   /**
    * Performs a GET request to the specified endpoint.
-   * @param {string} endpoint - The endpoint to which the request is made.
-   * @param {string} [token] - Optional token for authorization.
+   * @param {TRequest} request - The request object.
    * @returns {Promise<any>} The response data.
    */
-  public async get({ token, endpoint, origin }: TRequest): Promise<any> {
+  public async get(request: TRequest): Promise<any> {
+    const { token, endpoint, origin } = request;
     const url = origin ? endpoint : `${this.backendUrl}${endpoint}`;
     const res = await fetch(url, {
       headers: { Authorization: `bearer ${token}` },
@@ -42,18 +42,11 @@ export class RequestHandler {
 
   /**
    * Performs a POST request to the specified endpoint.
-   * @param {string} endpoint - The endpoint to which the request is made.
-   * @param {string} [token] - Optional token for authorization.
-   * @param {any} [payload] - Optional payload to send with the request.
-   * @param {boolean} [origin] - If set to true, the request will be sent to the origin instead of another server.
+   * @param {TRequest} request - The request object.
    * @returns {Promise<any>} The response data.
    */
-  public async post({
-    payload,
-    endpoint,
-    token,
-    origin,
-  }: TRequest): Promise<any> {
+  public async post(request: TRequest): Promise<any> {
+    const { payload, endpoint, token, origin } = request;
     const isFormData = payload instanceof FormData;
     const headers: { [key: string]: string } = {
       Authorization: `Bearer ${token}`,
@@ -81,12 +74,11 @@ export class RequestHandler {
 
   /**
    * Performs a PATCH request to the specified endpoint.
-   * @param {string} endpoint - The endpoint to which the request is made.
-   * @param {string} [token] - Optional token for authorization.
-   * @param {any} [payload] - Optional payload to send with the request.
+   * @param {TRequest} request - The request object.
    * @returns {Promise<any>} The response data.
    */
-  public async patch({ payload, token, endpoint }: TRequest): Promise<any> {
+  public async patch(request: TRequest): Promise<any> {
+    const { payload, token, endpoint, origin } = request;
     const isFormData = payload instanceof FormData;
     const url = origin ? endpoint : `${this.backendUrl}${endpoint}`;
     const headers: { [key: string]: string } = {
@@ -112,11 +104,11 @@ export class RequestHandler {
 
   /**
    * Performs a DELETE request to the specified endpoint.
-   * @param {string} endpoint - The endpoint to which the request is made.
-   * @param {string} [token] - Optional token for authorization.
+   * @param {TRequest} request - The request object.
    * @returns {Promise<void>} A promise that resolves when the request is successful.
    */
-  public async delete({ token, endpoint }: TRequest): Promise<void> {
+  public async delete(request: TRequest): Promise<void> {
+    const { token, endpoint, origin } = request;
     const url = origin ? endpoint : `${this.backendUrl}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
