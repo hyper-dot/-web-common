@@ -1,4 +1,4 @@
-import { throwExceptions } from "./exceptions";
+import { throwExceptions } from "./helpers/exceptions";
 
 /**
  * The URL of the backend server obtained from environment variables.
