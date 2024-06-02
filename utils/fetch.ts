@@ -23,7 +23,7 @@ export class RequestHandler {
    * @param {string} [token] - Optional token for authorization.
    * @returns {Promise<any>} The response data.
    */
-  public async getRequest(endpoint: string, token?: string): Promise<any> {
+  public async get(endpoint: string, token?: string): Promise<any> {
     const res = await fetch(`${this.backendUrl}${endpoint}`, {
       headers: { Authorization: `bearer ${token}` },
     });
@@ -40,7 +40,7 @@ export class RequestHandler {
    * @param {boolean} [origin] - If set to true, the request will be sent to the origin instead of another server.
    * @returns {Promise<any>} The response data.
    */
-  public async postRequest(
+  public async post(
     endpoint: string,
     token?: string,
     payload?: any,
@@ -78,7 +78,7 @@ export class RequestHandler {
    * @param {any} [payload] - Optional payload to send with the request.
    * @returns {Promise<any>} The response data.
    */
-  public async patchRequest(
+  public async patch(
     endpoint: string,
     token?: string,
     payload?: any,
@@ -111,7 +111,7 @@ export class RequestHandler {
    * @param {string} [token] - Optional token for authorization.
    * @returns {Promise<void>} A promise that resolves when the request is successful.
    */
-  public async deleteRequest(endpoint: string, token?: string): Promise<void> {
+  public async delete(endpoint: string, token?: string): Promise<void> {
     const res = await fetch(`${this.backendUrl}${endpoint}`, {
       method: "DELETE",
       headers: {
