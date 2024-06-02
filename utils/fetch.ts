@@ -1,125 +1,125 @@
 import { throwExceptions } from "./helpers/exceptions";
 
 /**
- * The URL of the backend server obtained from environment variables.
+ * A class for handling HTTP requests.
  */
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+export class RequestHandler {
+  /**
+   * The URL of the backend server.
+   */
+  private backendUrl: string;
 
-/**
- * Type definition for request parameters.
- */
-export type TRequest = {
-  /** The endpoint to which the request is made. */
-  endpoint: string;
-  /** Optional token for authorization. */
-  token?: string;
-  /** Optional payload to send with the request. */
-  payload?: any;
-  /** If set to true, the request will be sent to the origin instead of another server. */
-  origin?: boolean;
-};
-
-/**
- * Performs a GET request to the backend server.
- * @param {TRequest} options - The request options.
- * @returns {Promise<any>} The response data.
- */
-export const getRequest = async ({
-  endpoint,
-  token,
-}: TRequest): Promise<any> => {
-  const res = await fetch(`${BACKEND_URL}${endpoint}`, {
-    headers: { Authorization: `bearer ${token}` },
-  });
-  if (!res.ok) return throwExceptions(res);
-  const data = await res.json();
-  return data;
-};
-
-/**
- * Performs a POST request to the backend server.
- * @param {TRequest} options - The request options.
- * @returns {Promise<any>} The response data.
- */
-export const postRequest = async ({
-  endpoint,
-  token,
-  payload,
-  origin,
-}: TRequest): Promise<any> => {
-  const isFormData = payload instanceof FormData;
-  const headers: { [key: string]: string } = {
-    Authorization: `Bearer ${token}`,
-  };
-  if (!isFormData) {
-    headers["Content-Type"] = "application/json";
+  /**
+   * Constructs a new RequestHandler instance.
+   * @param {string} backendUrl - The URL of the backend server.
+   */
+  constructor(backendUrl: string) {
+    this.backendUrl = backendUrl;
   }
-  const url = origin ? endpoint : `${BACKEND_URL}${endpoint}`;
-  const res = await fetch(url, {
-    method: "POST",
-    body: isFormData ? payload : JSON.stringify(payload),
-    headers,
-  });
-  if (!res.ok) {
-    return throwExceptions(res);
+
+  /**
+   * Performs a GET request to the specified endpoint.
+   * @param {string} endpoint - The endpoint to which the request is made.
+   * @param {string} [token] - Optional token for authorization.
+   * @returns {Promise<any>} The response data.
+   */
+  public async getRequest(endpoint: string, token?: string): Promise<any> {
+    const res = await fetch(`${this.backendUrl}${endpoint}`, {
+      headers: { Authorization: `bearer ${token}` },
+    });
+    if (!res.ok) return throwExceptions(res);
+    const data = await res.json();
+    return data;
   }
-  try {
-    const text = await res.text();
-    return text ? JSON.parse(text) : {};
-  } catch (err) {
-    console.log(err);
+
+  /**
+   * Performs a POST request to the specified endpoint.
+   * @param {string} endpoint - The endpoint to which the request is made.
+   * @param {string} [token] - Optional token for authorization.
+   * @param {any} [payload] - Optional payload to send with the request.
+   * @param {boolean} [origin] - If set to true, the request will be sent to the origin instead of another server.
+   * @returns {Promise<any>} The response data.
+   */
+  public async postRequest(
+    endpoint: string,
+    token?: string,
+    payload?: any,
+    origin?: boolean,
+  ): Promise<any> {
+    const isFormData = payload instanceof FormData;
+    const headers: { [key: string]: string } = {
+      Authorization: `Bearer ${token}`,
+    };
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
+    const url = origin ? endpoint : `${this.backendUrl}${endpoint}`;
+    const res = await fetch(url, {
+      method: "POST",
+      body: isFormData ? payload : JSON.stringify(payload),
+      headers,
+    });
+    if (!res.ok) {
+      return throwExceptions(res);
+    }
+    try {
+      const text = await res.text();
+      return text ? JSON.parse(text) : {};
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  }
+
+  /**
+   * Performs a PATCH request to the specified endpoint.
+   * @param {string} endpoint - The endpoint to which the request is made.
+   * @param {string} [token] - Optional token for authorization.
+   * @param {any} [payload] - Optional payload to send with the request.
+   * @returns {Promise<any>} The response data.
+   */
+  public async patchRequest(
+    endpoint: string,
+    token?: string,
+    payload?: any,
+  ): Promise<any> {
+    const isFormData = payload instanceof FormData;
+    const headers: { [key: string]: string } = {
+      Authorization: `Bearer ${token}`,
+    };
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
+    const res = await fetch(`${this.backendUrl}${endpoint}`, {
+      method: "PATCH",
+      body: isFormData ? payload : JSON.stringify(payload),
+      headers,
+    });
+    if (!res.ok) return throwExceptions(res);
+    try {
+      const text = await res.text();
+      return text ? JSON.parse(text) : {};
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  }
+
+  /**
+   * Performs a DELETE request to the specified endpoint.
+   * @param {string} endpoint - The endpoint to which the request is made.
+   * @param {string} [token] - Optional token for authorization.
+   * @returns {Promise<void>} A promise that resolves when the request is successful.
+   */
+  public async deleteRequest(endpoint: string, token?: string): Promise<void> {
+    const res = await fetch(`${this.backendUrl}${endpoint}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `bearer ${token}`,
+      },
+    });
+    if (!res.ok) return throwExceptions(res);
     return;
   }
-};
-
-/**
- * Performs a PATCH request to the backend server.
- * @param {TRequest} options - The request options.
- * @returns {Promise<any>} The response data.
- */
-export const patchRequest = async ({
-  endpoint,
-  token,
-  payload,
-}: TRequest): Promise<any> => {
-  const isFormData = payload instanceof FormData;
-  const headers: { [key: string]: string } = {
-    Authorization: `Bearer ${token}`,
-  };
-  if (!isFormData) {
-    headers["Content-Type"] = "application/json";
-  }
-  const res = await fetch(`${BACKEND_URL}${endpoint}`, {
-    method: "PATCH",
-    body: isFormData ? payload : JSON.stringify(payload),
-    headers,
-  });
-  if (!res.ok) return throwExceptions(res);
-  try {
-    const text = await res.text();
-    return text ? JSON.parse(text) : {};
-  } catch (err) {
-    console.log(err);
-    return;
-  }
-};
-
-/**
- * Performs a DELETE request to the backend server.
- * @param {TRequest} options - The request options.
- * @returns {Promise<void>} A promise that resolves when the request is successful.
- */
-export const deleteRequest = async ({
-  token,
-  endpoint,
-}: TRequest): Promise<void> => {
-  const res = await fetch(`${BACKEND_URL}${endpoint}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `bearer ${token}`,
-    },
-  });
-  if (!res.ok) return throwExceptions(res);
-  return;
-};
+}
