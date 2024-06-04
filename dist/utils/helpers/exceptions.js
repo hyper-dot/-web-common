@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,6 +52,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.throwExceptions = void 0;
+var HttpError = /** @class */ (function (_super) {
+    __extends(HttpError, _super);
+    function HttpError(message, statusCode) {
+        var _this = _super.call(this, message) || this;
+        _this.statusCode = statusCode;
+        _this.name = "HttpError";
+        return _this;
+    }
+    return HttpError;
+}(Error));
 var throwExceptions = function (res) { return __awaiter(void 0, void 0, void 0, function () {
     var errorMessage, message;
     return __generator(this, function (_a) {
@@ -52,34 +77,34 @@ var throwExceptions = function (res) { return __awaiter(void 0, void 0, void 0, 
                 }
                 switch (res.status) {
                     case 400:
-                        throw new Error(errorMessage || "Invalid request.");
+                        throw new HttpError(errorMessage || "Invalid request.", 400);
                     case 401:
-                        throw new Error(errorMessage || "Unauthorized: Please log in.");
+                        throw new HttpError(errorMessage || "Unauthorized: Please log in.", 401);
                     case 403:
-                        throw new Error(errorMessage || "Access forbidden.");
+                        throw new HttpError(errorMessage || "Access forbidden.", 403);
                     case 404:
-                        throw new Error(errorMessage || "Resource not found.");
+                        throw new HttpError(errorMessage || "Resource not found.", 404);
                     case 405:
-                        throw new Error(errorMessage || "Method not allowed.");
+                        throw new HttpError(errorMessage || "Method not allowed.", 405);
                     case 408:
-                        throw new Error(errorMessage || "Request timeout.");
+                        throw new HttpError(errorMessage || "Request timeout.", 408);
                     case 500:
-                        throw new Error(errorMessage || "Server error.");
+                        throw new HttpError(errorMessage || "Server error.", 500);
                     case 502:
-                        throw new Error(errorMessage || "Bad gateway.");
+                        throw new HttpError(errorMessage || "Bad gateway.", 502);
                     case 503:
-                        throw new Error(errorMessage || "Service unavailable.");
+                        throw new HttpError(errorMessage || "Service unavailable.", 503);
                     case 504:
-                        throw new Error(errorMessage || "Gateway timeout.");
+                        throw new HttpError(errorMessage || "Gateway timeout.", 504);
                     default:
                         if (res.status >= 400 && res.status < 500) {
-                            throw new Error(errorMessage || "Invalid request.");
+                            throw new HttpError(errorMessage || "Invalid request.", res.status);
                         }
                         else if (res.status >= 500 && res.status < 600) {
-                            throw new Error(errorMessage || "Something went wrong on the server");
+                            throw new HttpError(errorMessage || "Something went wrong on the server", res.status);
                         }
                         else {
-                            throw new Error("Unexpected error.");
+                            throw new HttpError("Unexpected error.", res.status);
                         }
                 }
                 return [2 /*return*/];

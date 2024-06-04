@@ -5,17 +5,24 @@ exports.removeEmptyFields = void 0;
  * Removes empty fields (null, undefined, or empty string) from a given object recursively.
  */
 function removeEmptyFields(obj) {
-    for (var key in obj) {
-        if (obj[key] === "" || !obj[key]) {
-            delete obj[key];
+    var cleanedObject = {};
+    for (var _i = 0, _a = Object.entries(obj); _i < _a.length; _i++) {
+        var _b = _a[_i], key = _b[0], value = _b[1];
+        // Check for falsy values (null, undefined, empty string) except numbers and booleans
+        if ((value === "" || !value) &&
+            typeof value !== "number" &&
+            typeof value !== "boolean") {
+            continue; // Skip this property
         }
-        else if (Array.isArray(obj[key])) {
-            obj[key] = obj[key].filter(function (item) { return item !== ""; });
+        // Recursively handle nested objects (if applicable)
+        if (typeof value === "object" && value !== null) {
+            cleanedObject[key] = removeEmptyFields(value);
         }
-        else if (typeof obj[key] === "object" && obj[key] !== null) {
-            removeEmptyFields(obj[key]);
+        else {
+            // Include non-empty values (including numbers and booleans)
+            cleanedObject[key] = value;
         }
     }
-    return obj;
+    return cleanedObject;
 }
 exports.removeEmptyFields = removeEmptyFields;
