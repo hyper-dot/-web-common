@@ -4,14 +4,26 @@
 export function removeEmptyFields(
   obj: Record<string, any>,
 ): Record<string, any> {
-  for (let key in obj) {
-    if (obj[key] === "" || !obj[key]) {
-      delete obj[key];
-    } else if (Array.isArray(obj[key])) {
-      obj[key] = obj[key].filter((item: any) => item !== "");
-    } else if (typeof obj[key] === "object" && obj[key] !== null) {
-      removeEmptyFields(obj[key]);
+  const cleanedObject: any = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    // Check for falsy values (null, undefined, empty string) except numbers and booleans
+    if (
+      (value === "" || !value) &&
+      typeof value !== "number" &&
+      typeof value !== "boolean"
+    ) {
+      continue; // Skip this property
+    }
+
+    // Recursively handle nested objects (if applicable)
+    if (typeof value === "object" && value !== null) {
+      cleanedObject[key] = removeEmptyFields(value);
+    } else {
+      // Include non-empty values (including numbers and booleans)
+      cleanedObject[key] = value;
     }
   }
-  return obj;
+
+  return cleanedObject;
 }
